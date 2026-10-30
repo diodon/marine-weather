@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Near-real-time water quality, waves and weather for the Derwent Estuary around Blackmans Bay, Tasmania." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 20c4-4 8-4 12 0s8 4 12 0 4-2 4-2v8H2z' fill='%232a78d6'/%3E%3C/svg%3E" />
+    <title>Derwent Estuary · Blackmans Bay</title>
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <h1 id="title">Derwent Estuary · Blackmans Bay</h1>
+        <p id="updated" class="small muted">Loading…</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="overview">
+        <div id="map" class="card map" role="region" aria-label="Map of stations"></div>
+        <div>
+          <h2>Current conditions</h2>
+          <p class="small muted">Select a value to add or remove its chart.</p>
+          <div id="current" class="current"></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="history-title">
+        <div class="section-head">
+          <h2 id="history-title">History</h2>
+          <div class="filters" role="toolbar" aria-label="Chart filters">
+            <div id="range" class="segmented" role="group" aria-label="Time range"></div>
+            <label class="check small"><input id="questionable" type="checkbox" /> Include questionable data</label>
+            <button id="reset" type="button" class="link small">Reset charts</button>
+          </div>
+        </div>
+        <div id="charts" class="charts"></div>
+      </section>
+    </main>
+
+    <footer class="page-foot small muted">
+      <p>
+        Water quality and waves: <a href="https://imos.org.au/">IMOS</a> data via the
+        <a href="https://github.com/aodn/aodn_cloud_optimised">AODN cloud-optimised archive</a>
+        (CC BY 4.0). Weather: © Commonwealth of Australia,
+        <a href="https://www.bom.gov.au/">Bureau of Meteorology</a>.
+        Real-time data are provisional and may change after quality control. Not for navigation.
+      </p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

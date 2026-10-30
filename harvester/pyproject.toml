@@ -1,0 +1,21 @@
+[project]
+name = "marineweather-harvester"
+version = "0.1.0"
+description = "Harvests AODN cloud-optimised Parquet and BOM observations into static JSON for the Derwent dashboard"
+requires-python = ">=3.11"
+dependencies = [
+    "pyarrow>=17",
+    "pandas>=2.2",
+    "pyyaml>=6.0",
+    "requests>=2.32",
+]
+
+[project.scripts]
+harvest = "harvester.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/harvester"]
