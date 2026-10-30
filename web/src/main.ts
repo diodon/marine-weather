@@ -40,6 +40,28 @@ function writeHash(s: State) {
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const darkQuery = matchMedia("(prefers-color-scheme: dark)");
 
+// Theme: an explicit choice (data-theme on <html>, saved per browser) wins
+// over the OS setting. index.html applies the saved value before first paint.
+const isDark = () => {
+  const t = document.documentElement.dataset.theme;
+  return t ? t === "dark" : darkQuery.matches;
+};
+
+function renderThemeToggle() {
+  const dark = isDark();
+  const btn = $("#theme");
+  btn.setAttribute("aria-pressed", String(dark));
+  btn.querySelector(".theme-icon")!.textContent = dark ? "☀" : "☾";
+  btn.querySelector(".theme-label")!.textContent = dark ? "Light mode" : "Dark mode";
+  btn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+}
+
+function applyTheme() {
+  renderThemeToggle();
+  map?.setDark(isDark());
+  if (sources.length) charts.render(chartSpecs(), state); // chart colours are read from CSS tokens at build time
+}
+
 let manifest: Manifest;
 let sources: Source[] = [];
 let map: StationMap;
@@ -134,7 +156,8 @@ async function start() {
     $("#current").textContent = `Could not load data: ${(err as Error).message}`;
     return;
   }
-  map = createMap($("#map"), manifest, darkQuery.matches, (id) => {
+  renderThemeToggle();
+  map = createMap($("#map"), manifest, isDark(), (id) => {
     const card = document.getElementById(`station-${id}`);
     card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     card?.classList.add("flash");
@@ -148,9 +171,18 @@ async function start() {
     state.selected = null;
     render();
   });
-  darkQuery.addEventListener("change", (e) => {
-    map.setDark(e.matches);
-    charts.render(chartSpecs(), state); // chart colours are read from CSS tokens at build time
+  $("#theme").addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // storage unavailable (private mode etc.) — the toggle still works for this visit
+    }
+    applyTheme();
+  });
+  darkQuery.addEventListener("change", () => {
+    if (!document.documentElement.dataset.theme) applyTheme();
   });
   window.addEventListener("hashchange", () => {
     Object.assign(state, readHash());

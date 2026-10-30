@@ -6,6 +6,13 @@
     <meta name="description" content="Near-real-time water quality, waves and weather for the Derwent Estuary around Blackmans Bay, Tasmania." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 20c4-4 8-4 12 0s8 4 12 0 4-2 4-2v8H2z' fill='%232a78d6'/%3E%3C/svg%3E" />
     <title>Derwent Estuary · Blackmans Bay</title>
+    <script>
+      // Apply a saved theme before first paint so the page doesn't flash.
+      try {
+        const t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
   </head>
   <body>
     <header class="top">
@@ -13,6 +20,9 @@
         <h1 id="title">Derwent Estuary · Blackmans Bay</h1>
         <p id="updated" class="small muted">Loading…</p>
       </div>
+      <button id="theme" type="button" class="theme-toggle small" aria-pressed="false">
+        <span aria-hidden="true" class="theme-icon"></span><span class="theme-label">Dark mode</span>
+      </button>
     </header>
 
     <main>

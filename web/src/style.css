@@ -74,7 +74,27 @@ button { font: inherit; color: inherit; }
   margin: 0 auto;
   padding-inline: 16px;
 }
-.top { padding-block: 20px 12px; }
+.top {
+  padding-block: 20px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-1);
+  cursor: pointer;
+}
+.theme-toggle:hover { background: var(--wash); }
+.theme-toggle:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
+.theme-icon { font-size: 1rem; line-height: 1; }
 main { display: grid; gap: 28px; padding-bottom: 32px; }
 .page-foot { padding-block: 16px 32px; border-top: 1px solid var(--border); }
 
