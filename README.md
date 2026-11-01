@@ -85,3 +85,12 @@ IMOS is enabled by the National Collaborative Research Infrastructure
 Strategy (NCRIS). Weather observations © Commonwealth of Australia, Bureau of
 Meteorology. Basemap © OpenStreetMap contributors, OpenMapTiles, OpenFreeMap.
 Real-time data are provisional. Not for navigation.
+
+## Licence
+
+- **Code:** [MIT](LICENSE).
+- **Content** (the dashboard's original text and other non-code material):
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- **Data** are not covered by either licence and remain under their providers'
+  licences: IMOS / AODN (CC BY 4.0), Bureau of Meteorology (© Commonwealth of
+  Australia) and Open-Meteo / Copernicus Marine (CC BY 4.0).

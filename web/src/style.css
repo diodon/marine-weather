@@ -98,6 +98,9 @@ button { font: inherit; color: inherit; }
 main { display: grid; gap: 28px; padding-bottom: 32px; }
 .page-foot { padding-block: 16px 32px; border-top: 1px solid var(--border); }
 
+.foot-credits { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 16px; margin-top: 10px; }
+.foot-repo { display: inline-flex; align-items: center; gap: 6px; }
+
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);
