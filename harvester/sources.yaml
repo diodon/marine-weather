@@ -8,6 +8,9 @@ title: Derwent Estuary · Blackmans Bay
 center: {lon: 147.326, lat: -43.006, zoom: 10.6}   # Blackmans Bay, TAS
 window_days: 30                                     # history kept per source
 
+# Modelled tide near Blackmans Bay (Open-Meteo snaps this to its ~8 km grid).
+tide: {lat: -43.006, lon: 147.326, forecast_days: 8}   # UTC days; 8 covers a full 7 Hobart days
+
 sources:
   - id: derwent_b1
     kind: aodn_parquet
@@ -18,7 +21,7 @@ sources:
     partition: {key: site_code, value: TAS-DERWENT-RIVER-B1}
     qc: {mode: per_variable}            # <VAR>_quality_control: 1 pass, 2 not evaluated, 3 questionable, 4 fail, 9 missing
     stale_after_hours: 3
-    link: https://portal.aodn.org.au/
+    link: https://portal-beta.aodn.org.au/details/f3c16fdb-72fc-4b55-bff1-3b5b5722f38f
     # Variables of interest agreed for the Derwent site. FLUSI (FLU690/FLU670
     # ratio) is listed but not yet present in the live product's files — the
     # harvester skips columns a file doesn't carry, so it appears once it does.
@@ -42,7 +45,7 @@ sources:
     partition: {key: site_name, value: STORM-BAY}
     qc: {mode: single, column: WAVE_quality_control}   # 1 good, 2 not evaluated, 3 questionable, 4 bad, 9 missing
     stale_after_hours: 4
-    link: https://portal.aodn.org.au/
+    link: https://portal-beta.aodn.org.au/details/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc
     variables:
       WSSH:  {label: Significant wave height, units: m,  digits: 2, default: true}
       WPPE:  {label: Peak wave period,        units: s,  digits: 1, default: true}

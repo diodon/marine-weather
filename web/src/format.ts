@@ -14,7 +14,7 @@ export function withUnits(text: string, units: string): string {
   return /^[°%]/.test(units) ? `${text}${units}` : `${text} ${units}`;
 }
 
-const TZ = "Australia/Hobart";
+export const TZ = "Australia/Hobart";
 
 export const formatLocal = (unixSeconds: number, opts: Intl.DateTimeFormatOptions = {}) =>
   new Date(unixSeconds * 1000).toLocaleString("en-AU", {

@@ -7,9 +7,11 @@ A static dashboard on GitHub Pages showing current values and recent history for
 | **Derwent River B1** (IMOS estuarine & coastal mooring) | water temperature, salinity, O₂ saturation, chlorophyll-a, turbidity, fDOM, phycoerythrin, FLUSI | AODN cloud-optimised Parquet `mooring_estuarine_coastal_water_quality_monitoring_realtime_qc`, `site_code=TAS-DERWENT-RIVER-B1` |
 | **Storm Bay wave buoy** | significant wave height, peak and mean period, directions, spread | AODN cloud-optimised Parquet `wave_buoy_realtime_nonqc`, `site_name=STORM-BAY` |
 | **Dennes Point** (BOM AWS 094255, ~7 km from Blackmans Bay) | wind, gust, direction, air temperature, humidity, pressure, rain | BOM anonymous FTP `IDT60920.xml` |
+| **Tide** (modelled, ~8 km grid) | sea level, next high and low tides, 7-day table | Open-Meteo Marine API `sea_level_height_msl` |
+| **Sunrise, sunset** | calculated in the browser for the map centre | SunCalc |
 
 ```
-GitHub Actions (every 20 min)
+GitHub Actions (hourly)
   harvester/  ── reads s3://aodn-cloud-optimised (anonymous) + ftp.bom.gov.au
      │          merges with the currently published data/*.json
      ▼
@@ -37,6 +39,12 @@ that the static site loads.
 - **Resilience.** If an upstream fails, the last published file for that
   source is kept and flagged as "Upstream error". Sources whose newest
   reading is older than `stale_after_hours` are flagged "Stale".
+- **Tide.** BOM's FTP has no tide predictions, so heights come from Open-Meteo's
+  hourly ocean model (free for non-commercial use, CC BY 4.0). They are relative
+  to mean sea level rather than chart datum, include weather effects, and high/low
+  times are interpolated from hourly values. Treat them as a guide, not official
+  predictions. Each run fetches 7 days ahead, so the card keeps working through
+  upstream failures.
 - Variables declared in `sources.yaml` that a source doesn't currently report
   (e.g. FLUSI at Derwent B1) are skipped until they appear.
 
@@ -64,7 +72,7 @@ does with the published ones. `--only <id>` harvests a single source.
 1. Create the public repository and push `main`.
 2. Settings → Pages → Source: **GitHub Actions**.
 3. Run the **Harvest & deploy** workflow once from the Actions tab. After
-   that it runs on push and every 20 minutes.
+   that it runs on push and hourly.
 
 GitHub disables scheduled workflows in public repositories after 60 days
 without repository activity. Re-enable the workflow from the Actions tab if

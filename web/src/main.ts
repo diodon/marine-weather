@@ -1,9 +1,10 @@
 import "./style.css";
 import { ChartGrid, type ChartSpec } from "./charts";
 import { renderCurrent, seriesKey } from "./current";
-import { loadManifest, loadSources, type Manifest, type Source } from "./data";
+import { loadManifest, loadSources, loadTide, type Manifest, type Source, type Tide } from "./data";
 import { formatAge, formatLocal } from "./format";
 import { createMap, type StationMap } from "./map";
+import { renderTideSun } from "./tide";
 
 const POLL_MS = 5 * 60 * 1000;
 const RANGES = [
@@ -64,6 +65,7 @@ function applyTheme() {
 
 let manifest: Manifest;
 let sources: Source[] = [];
+let tide: Tide | null = null;
 let map: StationMap;
 const state = readHash();
 const charts = new ChartGrid($("#charts"));
@@ -122,10 +124,13 @@ function renderHeader() {
   el.title = manifest.generated_at;
 }
 
+const renderTide = () => renderTideSun($("#tide-sun"), tide, manifest.center);
+
 function render() {
   writeHash(state);
   renderHeader();
   renderFilters();
+  renderTide();
   renderCurrent($("#current"), sources, selection(), state.includeQuestionable, toggle);
   map.update(sources, state.includeQuestionable);
   charts.render(chartSpecs(), state);
@@ -135,12 +140,13 @@ async function refresh(force = false) {
   const next = await loadManifest();
   if (!force && manifest && next.generated_at === manifest.generated_at) {
     renderHeader(); // keep the "x min ago" honest
+    renderTide(); // and the next tide
     renderCurrent($("#current"), sources, selection(), state.includeQuestionable, toggle);
     return;
   }
   document.body.classList.add("loading"); // previous render stays visible, dimmed
   try {
-    sources = await loadSources(next);
+    [sources, tide] = await Promise.all([loadSources(next), loadTide(next)]);
     manifest = next;
     render();
   } finally {
@@ -151,7 +157,7 @@ async function refresh(force = false) {
 async function start() {
   try {
     manifest = await loadManifest();
-    sources = await loadSources(manifest);
+    [sources, tide] = await Promise.all([loadSources(manifest), loadTide(manifest)]);
   } catch (err) {
     $("#current").textContent = `Could not load data: ${(err as Error).message}`;
     return;

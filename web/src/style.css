@@ -237,6 +237,14 @@ main { display: grid; gap: 28px; padding-bottom: 32px; }
 .tile:hover { background: var(--wash); }
 .tile[aria-pressed="true"] { border-color: var(--c); box-shadow: inset 3px 0 0 var(--c); }
 .tile:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
+.tile-static { cursor: default; }
+.tile-static:hover { background: transparent; }
+.tide-sun { margin-bottom: 14px; }
+.tide-plot svg { display: block; touch-action: pan-y; }
+.tide-plot .chart-tip[hidden] { display: none; }
+.tide-sun td:nth-child(-n+3), .tide-sun th:nth-child(-n+3) { white-space: nowrap; }
+.tide-axis { font-size: 11px; fill: var(--text-muted); }
+.tide-label { fill: var(--text-secondary); }
 .tile-label { font-size: 0.78rem; color: var(--text-secondary); }
 .tile-value { font-size: 1.25rem; font-weight: 600; }
 .tile-sub { font-size: 0.72rem; color: var(--text-secondary); }

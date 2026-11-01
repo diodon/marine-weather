@@ -49,7 +49,27 @@ export interface Manifest {
   center: { lon: number; lat: number; zoom: number };
   window_days: number;
   generated_at: string;
+  /** Absent or null until the tide feed has published. */
+  tide?: string | null;
   sources: ManifestSource[];
+}
+
+export interface TideExtreme {
+  time: number;
+  height: number;
+  type: "high" | "low";
+}
+
+export interface Tide {
+  lat: number;
+  lon: number;
+  generated_at: string;
+  status: "ok" | "fallback";
+  warnings: string[];
+  /** Unix seconds, hourly and ascending; `height` is metres relative to mean sea level. */
+  time: number[];
+  height: number[];
+  extremes: TideExtreme[];
 }
 
 const DATA_BASE = "data/";
@@ -65,6 +85,17 @@ export const loadManifest = () => getJson<Manifest>("manifest.json");
 
 export async function loadSources(manifest: Manifest): Promise<Source[]> {
   return Promise.all(manifest.sources.map((s) => getJson<Source>(s.file)));
+}
+
+/** Sun times don't depend on it, so a missing tide file must not take the page down. */
+export async function loadTide(manifest: Manifest): Promise<Tide | null> {
+  if (!manifest.tide) return null;
+  try {
+    return await getJson<Tide>(manifest.tide);
+  } catch (err) {
+    console.warn("tide unavailable", err);
+    return null;
+  }
 }
 
 /** Latest non-null value of a variable, optionally skipping questionable points. */

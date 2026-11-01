@@ -10,7 +10,7 @@ name: Harvest & deploy
 
 on:
   schedule:
-    - cron: "*/20 * * * *"   # GitHub may delay scheduled runs at busy times
+    - cron: "17 * * * *"   # hourly, off the busy top of the hour; GitHub may still delay runs
   workflow_dispatch:
   push:
     branches: [main]

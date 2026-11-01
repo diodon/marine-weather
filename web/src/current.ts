@@ -107,7 +107,7 @@ export function renderCurrent(
   );
 }
 
-function badge(kind: "warning" | "serious", label: string, title: string): HTMLElement {
+export function badge(kind: "warning" | "serious", label: string, title: string): HTMLElement {
   const b = document.createElement("span");
   b.className = `badge badge-${kind}`;
   b.title = title;

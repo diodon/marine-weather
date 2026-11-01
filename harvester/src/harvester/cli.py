@@ -28,7 +28,7 @@ import pandas as pd
 import requests
 import yaml
 
-from . import aodn, bom
+from . import aodn, bom, tides
 
 log = logging.getLogger("harvest")
 
@@ -174,6 +174,21 @@ def harvest_source(source: dict, start: pd.Timestamp, prev: dict | None, now: da
     return build_payload(source, df, questionable, float(lat), float(lon), "ok", warnings, now)
 
 
+def harvest_tide(config: dict, out_dir: Path, previous_url: str | None, now: datetime) -> str | None:
+    """Write tide.json, falling back to the last good file; return its name if there is one."""
+    prev = load_previous("tide", out_dir, previous_url)
+    try:
+        payload = tides.read_tide(config["tide"], now)
+        log.info("tide: %d hours, %d highs/lows", len(payload["time"]), len(payload["extremes"]))
+    except Exception as exc:  # noqa: BLE001 — any upstream failure falls back
+        log.error("tide failed: %s: %s", type(exc).__name__, exc)
+        if prev is None:
+            return None
+        payload = prev | {"status": "fallback", "warnings": [f"{type(exc).__name__}: {exc}"]}
+    (out_dir / "tide.json").write_text(json.dumps(payload, separators=(",", ":")))
+    return "tide.json"
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", type=Path, default=Path(__file__).resolve().parents[2] / "sources.yaml")
@@ -222,11 +237,19 @@ def main(argv: list[str] | None = None) -> int:
             key=lambda m: order.index(m["id"]) if m["id"] in order else len(order),
         )
 
+    tide_file = None
+    if "tide" in config:
+        if not args.only or "tide" in args.only:
+            tide_file = harvest_tide(config, args.out, args.previous_url, now)
+        elif (args.out / "tide.json").exists():
+            tide_file = "tide.json"
+
     manifest = {
         "title": config.get("title", "Marine weather"),
         "center": config["center"],
         "window_days": config.get("window_days", 30),
         "generated_at": now.isoformat(timespec="seconds"),
+        "tide": tide_file,
         "sources": manifest_sources,
     }
     (args.out / "manifest.json").write_text(json.dumps(manifest, indent=1))
