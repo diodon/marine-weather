@@ -3,6 +3,8 @@ import { compass, formatAge, formatLocal, formatValue, withUnits } from "./forma
 
 export const seriesKey = (sourceId: string, variable: string) => `${sourceId}:${variable}`;
 
+const KNOTS_TO_MS = 1852 / 3600;
+
 /** Current-conditions cards: one per source, one toggleable stat tile per
  *  variable. Pressing a tile adds/removes that variable's chart below. */
 export function renderCurrent(
@@ -68,6 +70,12 @@ export function renderCurrent(
         const digits = v.digits ?? 1;
         value.textContent = lv === null ? "—" : withUnits(formatValue(lv.value, digits), v.units);
         tile.append(label, value);
+        if (lv && v.units === "kn") {
+          const sub = document.createElement("span");
+          sub.className = "tile-sub";
+          sub.textContent = withUnits(formatValue(lv.value * KNOTS_TO_MS, 1), "m/s");
+          tile.append(sub);
+        }
         if (lv && v.direction) {
           const sub = document.createElement("span");
           sub.className = "tile-sub";
