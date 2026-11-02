@@ -8,8 +8,8 @@ title: Derwent Estuary · Blackmans Bay
 center: {lon: 147.326, lat: -43.006, zoom: 10.6}   # Blackmans Bay, TAS
 window_days: 30                                     # history kept per source
 
-# Modelled tide near Blackmans Bay (Open-Meteo snaps this to its ~8 km grid).
-tide: {lat: -43.006, lon: 147.326, forecast_days: 8}   # UTC days; 8 covers a full 7 Hobart days
+# BOM predictions for Hobart, from harvester/src/harvester/data/bom_tides_hobart.json.
+tide: {forecast_days: 8}   # 8 covers a full 7 Hobart days
 
 sources:
   - id: derwent_b1

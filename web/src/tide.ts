@@ -11,9 +11,18 @@ const CHART_HEIGHT = 170;
 const LABEL_MIN_WIDTH = 480; // below this, high/low time labels would collide
 const PAD = { top: 22, right: 8, bottom: 24, left: 36 };
 
+// Required wording, from the Conditions of Use in BOM's tide table PDFs.
+const BOM_DISCLAIMER = `
+<p>The Bureau of Meteorology gives no warranty of any kind whether express, implied, statutory or otherwise in respect to the availability, accuracy, currency, completeness, quality or reliability of the information or that the information will be fit for any particular purpose or will not infringe any third party Intellectual Property rights.</p>
+<p>The Bureau's liability for any loss, damage, cost or expense resulting from use of, or reliance on, the information is entirely excluded.</p>
+<p>This product is based on Bureau of Meteorology information that has subsequently been modified. The Bureau does not necessarily support or endorse, or have any connection with, the product.</p>
+<p>In respect of that part of the information which is sourced from the Bureau, and to the maximum extent permitted by law:</p>
+<p>(i) The Bureau makes no representation and gives no warranty of any kind whether express, implied, statutory or otherwise in respect to the availability, accuracy, currency, completeness, quality or reliability of the information or that the information will be fit for any particular purpose or will not infringe any third party Intellectual Property rights; and</p>
+<p>(ii) the Bureau's liability for any loss, damage, cost or expense resulting from use of, or reliance on, the information is entirely excluded.</p>`;
+
 const clock = (t: number) => formatLocal(t, { day: undefined, month: undefined });
 const weekday = (t: number) => formatLocal(t, { weekday: "short", day: undefined, month: undefined, hour: undefined, minute: undefined });
-const metres = (h: number) => withUnits(`${h > 0 ? "+" : ""}${formatValue(h, 2)}`, "m");
+const metres = (h: number) => withUnits(formatValue(h, 2), "m");
 
 interface SunDay {
   noon: number;
@@ -109,7 +118,7 @@ function renderChart(plot: HTMLElement, tide: Tide, nights: SunDay[], now: numbe
   }
   svg += `<line class="tide-cursor" y1="${PAD.top}" y2="${CHART_HEIGHT - PAD.bottom}" stroke="var(--axis)" visibility="hidden"/>`;
 
-  plot.innerHTML = `<svg width="${width}" height="${CHART_HEIGHT}" viewBox="0 0 ${width} ${CHART_HEIGHT}" role="img" aria-label="Modelled tide height from 6 hours ago to 42 hours ahead; the same high and low tides are in the table below">${svg}</svg>`;
+  plot.innerHTML = `<svg width="${width}" height="${CHART_HEIGHT}" viewBox="0 0 ${width} ${CHART_HEIGHT}" role="img" aria-label="Predicted tide height from 6 hours ago to 42 hours ahead; the same high and low tides are in the table below">${svg}</svg>`;
 
   const tip = document.createElement("div");
   tip.className = "chart-tip";
@@ -173,6 +182,7 @@ function renderTable(tide: Tide | null, days: SunDay[]): HTMLElement {
 export function renderTideSun(container: HTMLElement, tide: Tide | null, center: { lat: number; lon: number }): void {
   const now = Date.now() / 1000;
   const wasOpen = container.querySelector("details")?.open ?? false;
+  const termsOpen = container.querySelector<HTMLDetailsElement>(".tide-terms")?.open ?? false;
   const [today] = sunDays(now, center.lat, center.lon, 0, 1);
 
   const card = document.createElement("article");
@@ -183,7 +193,7 @@ export function renderTideSun(container: HTMLElement, tide: Tide | null, center:
   const desc = document.createElement("p");
   desc.className = "muted small";
   desc.textContent = tide
-    ? "Modelled sea level near Blackmans Bay, relative to mean sea level (not chart datum). Not an official tide prediction."
+    ? "Bureau of Meteorology predictions for Hobart, about 14 km north of Blackmans Bay. Heights are above Lowest Astronomical Tide and exclude weather effects. High and low tides are BOM's values; “Tide now” and the curve between them are our estimate."
     : "Blackmans Bay";
   head.append(title, desc);
   if (tide?.status === "fallback") {
@@ -220,8 +230,9 @@ export function renderTideSun(container: HTMLElement, tide: Tide | null, center:
   const foot = document.createElement("footer");
   foot.className = "muted small";
   foot.innerHTML = tide
-    ? 'Tide: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0), generated using E.U. Copernicus Marine Service Information. Hourly model on an ~8 km grid, including weather effects. Sun times are calculated. Shaded bands are night.'
+    ? `Tide predictions: © Commonwealth of Australia 2025–2026, <a href="https://www.bom.gov.au/australia/tides/#!/tas-hobart" target="_blank" rel="noopener">Bureau of Meteorology</a>. Not for navigation. Sun times are calculated. Shaded bands are night.<details class="tide-terms"><summary>Bureau of Meteorology disclaimer</summary>${BOM_DISCLAIMER}</details>`
     : "Sun times are calculated.";
+  foot.querySelector<HTMLDetailsElement>(".tide-terms")?.toggleAttribute("open", termsOpen);
 
   card.append(head, tiles);
   let plot: HTMLElement | null = null;

@@ -66,7 +66,7 @@ export interface Tide {
   generated_at: string;
   status: "ok" | "fallback";
   warnings: string[];
-  /** Unix seconds, hourly and ascending; `height` is metres relative to mean sea level. */
+  /** Unix seconds, ascending; `height` is metres above Lowest Astronomical Tide. */
   time: number[];
   height: number[];
   extremes: TideExtreme[];

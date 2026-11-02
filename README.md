@@ -7,7 +7,7 @@ A static dashboard on GitHub Pages showing current values and recent history for
 | **Derwent River B1** (IMOS estuarine & coastal mooring) | water temperature, salinity, O₂ saturation, chlorophyll-a, turbidity, fDOM, phycoerythrin, FLUSI | AODN cloud-optimised Parquet `mooring_estuarine_coastal_water_quality_monitoring_realtime_qc`, `site_code=TAS-DERWENT-RIVER-B1` |
 | **Storm Bay wave buoy** | significant wave height, peak and mean period, directions, spread | AODN cloud-optimised Parquet `wave_buoy_realtime_nonqc`, `site_name=STORM-BAY` |
 | **Dennes Point** (BOM AWS 094255, ~7 km from Blackmans Bay) | wind, gust, direction, air temperature, humidity, pressure, rain | BOM anonymous FTP `IDT60920.xml` |
-| **Tide** (modelled, ~8 km grid) | sea level, next high and low tides, 7-day table | Open-Meteo Marine API `sea_level_height_msl` |
+| **Tide** (Hobart predictions) | estimated height now, next high and low tides, 7-day table | BOM annual tide tables (`TidesBOM/`) |
 | **Sunrise, sunset** | calculated in the browser for the map centre | SunCalc |
 
 ```
@@ -39,12 +39,13 @@ that the static site loads.
 - **Resilience.** If an upstream fails, the last published file for that
   source is kept and flagged as "Upstream error". Sources whose newest
   reading is older than `stale_after_hours` are flagged "Stale".
-- **Tide.** BOM's FTP has no tide predictions, so heights come from Open-Meteo's
-  hourly ocean model (free for non-commercial use, CC BY 4.0). They are relative
-  to mean sea level rather than chart datum, include weather effects, and high/low
-  times are interpolated from hourly values. Treat them as a guide, not official
-  predictions. Each run fetches 7 days ahead, so the card keeps working through
-  upstream failures.
+- **Tide.** High and low tides are BOM's official predictions for Hobart, above
+  Lowest Astronomical Tide, excluding weather effects. BOM's FTP has no tide
+  predictions, so they come from its annual PDF tables in `TidesBOM/`, and the card
+  shows the disclaimers those tables' Conditions of Use require. The height between
+  tides is our own cosine interpolation. The tables end on 31 December 2027: before
+  then, add the next PDF and rerun `harvester/scripts/parse_bom_tides.py` (needs
+  poppler's `pdftotext`).
 - Variables declared in `sources.yaml` that a source doesn't currently report
   (e.g. FLUSI at Derwent B1) are skipped until they appear.
 
@@ -92,5 +93,5 @@ Real-time data are provisional. Not for navigation.
 - **Content** (the dashboard's original text and other non-code material):
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 - **Data** are not covered by either licence and remain under their providers'
-  licences: IMOS / AODN (CC BY 4.0), Bureau of Meteorology (© Commonwealth of
-  Australia) and Open-Meteo / Copernicus Marine (CC BY 4.0).
+  licences: IMOS / AODN (CC BY 4.0) and Bureau of Meteorology (© Commonwealth of
+  Australia).

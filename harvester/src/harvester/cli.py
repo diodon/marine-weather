@@ -179,7 +179,7 @@ def harvest_tide(config: dict, out_dir: Path, previous_url: str | None, now: dat
     prev = load_previous("tide", out_dir, previous_url)
     try:
         payload = tides.read_tide(config["tide"], now)
-        log.info("tide: %d hours, %d highs/lows", len(payload["time"]), len(payload["extremes"]))
+        log.info("tide: %d curve points, %d highs/lows", len(payload["time"]), len(payload["extremes"]))
     except Exception as exc:  # noqa: BLE001 — any upstream failure falls back
         log.error("tide failed: %s: %s", type(exc).__name__, exc)
         if prev is None:
