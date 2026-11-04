@@ -28,7 +28,14 @@ export function createMap(
     zoom: manifest.center.zoom,
     attributionControl: { compact: true },
     cooperativeGestures: true,
+    // Plan view only: pan and zoom, no tilt or rotation.
+    dragRotate: false,
+    pitchWithRotate: false,
+    touchPitch: false,
+    maxPitch: 0,
   });
+  map.touchZoomRotate.disableRotation();
+  map.keyboard.disableRotation();
   // Keep Blackmans Bay at the centre but zoom out far enough to show every
   // station: fit bounds that include each station and its mirror image
   // through the centre.
